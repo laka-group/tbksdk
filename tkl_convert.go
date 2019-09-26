@@ -14,6 +14,15 @@ import (
 	"time"
 )
 
+type ErrorResponse struct {
+	ErrorResponse struct{
+		SubMsg string `json:"sub_msg"`
+		Code int64 `json:"code"`
+		SubCode string `json:"sub_code"`
+		Msg string `json:"msg"`
+	} `json:"error_response"`
+}
+
 // https://open.taobao.com/api.htm?docId=43873&docType=2&scopeId=16401
 // taobao.tbk.sc.tpwd.convert
 type respDataTpwdConvert struct {
@@ -63,6 +72,9 @@ type respDataItemInfo struct {
 		} `json:"results"`
 	} `json:"tbk_item_info_get_response"`
 }
+
+type ItemInfoMap map[int64]itemInfo
+
 type itemInfo struct {
 	CatName     string `json:"cat_name"`
 	NumIid      int64  `json:"num_iid"`
@@ -158,7 +170,13 @@ func PrivilegeGet(session string, itemId int64, adzoneId string, siteId string) 
 	if err != nil {
 		return nil, err
 	}
+	//得到了返回,但不是item信息,尝试解析为ErrorResponse
 	if respData.TbkPrivilegeGetResponse.Result.Data.ItemID == 0 {
+		errorResponse := ErrorResponse{}
+		_ = json.Unmarshal(*bodyByte, &errorResponse)
+		if errorResponse.ErrorResponse.Code != 0 {
+			return nil, errors.New(string(*bodyByte))
+		}
 		return nil, errors.New("respData.TbkPrivilegeGetResponse.Result.Data.ItemID is 0")
 	}
 	return &respData.TbkPrivilegeGetResponse.Result.Data, nil
@@ -276,6 +294,53 @@ func SearchTitle(session, title, adzoneId, siteId string) ([]SearchResultList, e
 		return nil, err
 	}
 	return respData.TbkScMaterialOptionalResponse.ResultList.MapData, nil
+}
+
+type TbkCouponGetResponse struct {
+	TbkCouponGetResponse struct {
+		Data TbkCouponGetData `json:"data"`
+	} `json:"tbk_coupon_get_response"`
+}
+
+type TbkCouponGetData struct {
+	CouponStartFee string `json:"coupon_start_fee"`
+	CouponRemainCount int64 `json:"coupon_remain_count"`
+	CouponTotalCount int64 `json:"coupon_total_count"`
+	CouponEndTime string `json:"coupon_end_time"`
+	CouponStartTime string `json:"coupon_start_time"`
+	CouponAmount string `json:"coupon_amount"`
+	CouponSrcScene int64 `json:"coupon_src_scene"`
+	CouponType int64 `json:"coupon_type"`
+	CouponActivityId string `json:"coupon_activity_id"`
+}
+
+/**
+淘宝客-公用-阿里妈妈推广券详情查询
+https://open.taobao.com/api.htm?spm=a219a.7386797.0.0.40b2669alwkQgI&source=search&docId=31106&docType=2
+*/
+func TbkCouponGet(itemId int64,couponId string) (*TbkCouponGetData,error)  {
+	var paramsMap = map[string]string{
+		"item_id": strconv.FormatInt(itemId,10),
+		"activity_id": couponId,
+	}
+	var bodyByte, err = apply(Constants.AlimamaTbkCouponGet, paramsMap)
+	if err != nil {
+		return nil, err
+	}
+	var respData = TbkCouponGetResponse{}
+	err = json.Unmarshal(*bodyByte, &respData)
+	if err != nil {
+		return nil, err
+	}
+	if respData.TbkCouponGetResponse.Data.CouponActivityId == "" {
+		errorResponse := ErrorResponse{}
+		_ = json.Unmarshal(*bodyByte, &errorResponse)
+		if errorResponse.ErrorResponse.Code != 0 {
+			return nil, errors.New(string(*bodyByte))
+		}
+		return nil, errors.New("data is empty")
+	}
+	return &respData.TbkCouponGetResponse.Data, nil
 }
 
 func apply(api string, params map[string]string) (*[]byte, error) {

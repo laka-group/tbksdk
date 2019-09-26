@@ -9,6 +9,7 @@ type constants struct {
 	AlimamaPrivilegeGet       string
 	AlimamaTklCreate          string
 	AlimamaScMaterialOptional string
+	AlimamaTbkCouponGet       string
 }
 
 var Constants = constants{}
@@ -24,4 +25,5 @@ func init() {
 	Constants.AlimamaPrivilegeGet = "taobao.tbk.privilege.get" // 淘宝客-服务商-单品券高效转链
 	Constants.AlimamaTklCreate = "taobao.tbk.tpwd.create"
 	Constants.AlimamaScMaterialOptional = "taobao.tbk.sc.material.optional"
+	Constants.AlimamaTbkCouponGet = "taobao.tbk.coupon.get"
 }
