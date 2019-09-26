@@ -15,11 +15,11 @@ import (
 )
 
 type ErrorResponse struct {
-	ErrorResponse struct{
-		SubMsg string `json:"sub_msg"`
-		Code int64 `json:"code"`
+	ErrorResponse struct {
+		SubMsg  string `json:"sub_msg"`
+		Code    int64  `json:"code"`
 		SubCode string `json:"sub_code"`
-		Msg string `json:"msg"`
+		Msg     string `json:"msg"`
 	} `json:"error_response"`
 }
 
@@ -303,24 +303,24 @@ type TbkCouponGetResponse struct {
 }
 
 type TbkCouponGetData struct {
-	CouponStartFee string `json:"coupon_start_fee"`
-	CouponRemainCount int64 `json:"coupon_remain_count"`
-	CouponTotalCount int64 `json:"coupon_total_count"`
-	CouponEndTime string `json:"coupon_end_time"`
-	CouponStartTime string `json:"coupon_start_time"`
-	CouponAmount string `json:"coupon_amount"`
-	CouponSrcScene int64 `json:"coupon_src_scene"`
-	CouponType int64 `json:"coupon_type"`
-	CouponActivityId string `json:"coupon_activity_id"`
+	CouponStartFee    string `json:"coupon_start_fee"`
+	CouponRemainCount int64  `json:"coupon_remain_count"`
+	CouponTotalCount  int64  `json:"coupon_total_count"`
+	CouponEndTime     string `json:"coupon_end_time"`
+	CouponStartTime   string `json:"coupon_start_time"`
+	CouponAmount      string `json:"coupon_amount"`
+	CouponSrcScene    int64  `json:"coupon_src_scene"`
+	CouponType        int64  `json:"coupon_type"`
+	CouponActivityId  string `json:"coupon_activity_id"`
 }
 
 /**
 淘宝客-公用-阿里妈妈推广券详情查询
 https://open.taobao.com/api.htm?spm=a219a.7386797.0.0.40b2669alwkQgI&source=search&docId=31106&docType=2
 */
-func TbkCouponGet(itemId int64,couponId string) (*TbkCouponGetData,error)  {
+func TbkCouponGet(itemId int64, couponId string) (*TbkCouponGetData, error) {
 	var paramsMap = map[string]string{
-		"item_id": strconv.FormatInt(itemId,10),
+		"item_id":     strconv.FormatInt(itemId, 10),
 		"activity_id": couponId,
 	}
 	var bodyByte, err = apply(Constants.AlimamaTbkCouponGet, paramsMap)
