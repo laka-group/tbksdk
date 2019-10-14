@@ -343,6 +343,106 @@ func TbkCouponGet(itemId int64, couponId string) (*TbkCouponGetData, error) {
 	return &respData.TbkCouponGetResponse.Data, nil
 }
 
+type tbkScOrderDetailsGetResponseData struct {
+	TbkScOrderDetailsGetResponse TbkScOrderDetailsGetResponse `json:"tbk_sc_order_details_get_response"`
+}
+type TbkScOrderDetailsGetResponse struct {
+	Data struct {
+		Results struct {
+			PublisherOrderDto []PublisherOrderDto `json:"publisher_order_dto"`
+		} `json:"results"`
+		HasPre        bool   `json:"has_pre"`
+		PositionIndex string `json:"position_index"`
+		HasNext       bool   `json:"has_next"`
+		PageNo        int64  `json:"page_no"`
+		PageSize      int64  `json:"page_size"`
+	} `json:"data"`
+}
+type PublisherOrderDto struct {
+	TbPaidTime                         string `json:"tb_paid_time"`
+	TkPaidTime                         string `json:"tk_paid_time"`
+	PayPrice                           string `json:"pay_price"`
+	PubShareFee                        string `json:"pub_share_fee"`
+	TradeId                            string `json:"trade_id"`
+	TkOrderRole                        int64  `json:"tk_order_role"`
+	TkEarningTime                      string `json:"tk_earning_time"`
+	AdzoneId                           int64  `json:"adzone_id"`
+	PubShareRate                       string `json:"pub_share_rate"`
+	RefundTag                          int64  `json:"refund_tag"`
+	SubsidyRate                        string `json:"subsidy_rate"`
+	TkTotalRate                        string `json:"tk_total_rate"`
+	ItemCategoryName                   string `json:"item_category_name"`
+	SellerNick                         string `json:"seller_nick"`
+	PubId                              int64  `json:"pub_id"`
+	AlimamaRate                        string `json:"alimama_rate"`
+	SubsidyType                        string `json:"subsidy_type"`
+	ItemImg                            string `json:"item_img"`
+	PubSharePreFee                     string `json:"pub_share_pre_fee"`
+	AlipayTotalPrice                   string `json:"alipay_total_price"`
+	ItemTitle                          string `json:"item_title"`
+	SiteName                           string `json:"site_name"`
+	ItemNum                            int64  `json:"item_num"`
+	SubsidyFee                         string `json:"subsidy_fee"`
+	AlimamaShareFee                    string `json:"alimama_share_fee"`
+	TradeParentId                      string `json:"trade_parent_id"`
+	OrderType                          string `json:"order_type"`
+	TkCreateTime                       string `json:"tk_create_time"`
+	FlowSource                         string `json:"flow_source"`
+	TerminalType                       string `json:"terminal_type"`
+	ClickTime                          string `json:"click_time"`
+	TkStatus                           int8   `json:"tk_status"`
+	ItemPrice                          string `json:"item_price"`
+	ItemId                             int64  `json:"item_id"`
+	AdzoneName                         string `json:"adzone_name"`
+	TotalCommissionRate                string `json:"total_commission_rate"`
+	ItemLink                           string `json:"item_link"`
+	SiteId                             int64  `json:"site_id"`
+	SellerShopTitle                    string `json:"seller_shop_title"`
+	IncomeRate                         string `json:"income_rate"`
+	TotalCommissionFee                 string `json:"total_commission_fee"`
+	TkCommissionPreFeeForMediaPlatform string `json:"tk_commission_pre_fee_for_media_platform"`
+	TkCommissionFeeForMediaPlatform    string `json:"tk_commission_fee_for_media_platform"`
+	TkCommissionRateForMediaPlatform   string `json:"tk_commission_rate_for_media_platform"`
+	SpecialId                          int64  `json:"special_id"`
+	RelationId                         int64  `json:"relation_id"`
+}
+
+/**
+淘宝客-服务商-所有订单查询
+https://open.taobao.com/api.htm?spm=a219a.7386653.0.0.2b43669aJY6jMz&source=search&docId=43755&docType=2
+*/
+func TbkScOrderDetailsGet(startTime string, endTime string, session string, pageNo int64, pageSize int64, positionIndex string, queryType int64) (*TbkScOrderDetailsGetResponse, error) {
+	var paramsMap = map[string]string{
+		"start_time":     startTime,
+		"end_time":       endTime,
+		"session":        session,
+		"page_no":        strconv.FormatInt(pageNo, 10),
+		"page_size":      strconv.FormatInt(pageSize, 10),
+		"position_index": positionIndex,
+		"query_type":     strconv.FormatInt(queryType, 10),
+		"jump_type":      "1",
+		"order_scene":    "1",
+	}
+	var bodyByte, err = apply(Constants.AlimamaTbkScOrderDetailsGet, paramsMap)
+	if err != nil {
+		return nil, err
+	}
+	var respData = tbkScOrderDetailsGetResponseData{}
+	err = json.Unmarshal(*bodyByte, &respData)
+	if err != nil {
+		return nil, err
+	}
+	if respData.TbkScOrderDetailsGetResponse.Data.PageNo == 0 {
+		errorResponse := ErrorResponse{}
+		_ = json.Unmarshal(*bodyByte, &errorResponse)
+		if errorResponse.ErrorResponse.Code != 0 {
+			return nil, errors.New(string(*bodyByte))
+		}
+		return nil, errors.New("data is empty")
+	}
+	return &respData.TbkScOrderDetailsGetResponse, nil
+}
+
 func apply(api string, params map[string]string) (*[]byte, error) {
 	paramMap := map[string]string{
 		"app_key":     Constants.AlimamaKey,
@@ -387,9 +487,9 @@ func createSign(paramMap map[string]string) string {
 	sign := Constants.AlimamaSecret
 	var paramKeySlice []string
 
-	for k, v := range paramMap {
+	for k, _ := range paramMap {
 		//&& k != "session"
-		if k != "" && v != "" {
+		if k != "" {
 			paramKeySlice = append(paramKeySlice, k)
 		}
 	}

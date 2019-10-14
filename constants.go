@@ -1,15 +1,16 @@
 package tbksdk
 
 type constants struct {
-	AlimamaKey                string
-	AlimamaSecret             string
-	AlimamaApiUrl             string
-	AlimamaTpwdConvertUrl     string
-	AlimamaItemInfoGetUrl     string
-	AlimamaPrivilegeGet       string
-	AlimamaTklCreate          string
-	AlimamaScMaterialOptional string
-	AlimamaTbkCouponGet       string
+	AlimamaKey                  string
+	AlimamaSecret               string
+	AlimamaApiUrl               string
+	AlimamaTpwdConvertUrl       string
+	AlimamaItemInfoGetUrl       string
+	AlimamaPrivilegeGet         string
+	AlimamaTklCreate            string
+	AlimamaScMaterialOptional   string
+	AlimamaTbkCouponGet         string
+	AlimamaTbkScOrderDetailsGet string
 }
 
 var Constants = constants{}
@@ -26,4 +27,5 @@ func init() {
 	Constants.AlimamaTklCreate = "taobao.tbk.tpwd.create"
 	Constants.AlimamaScMaterialOptional = "taobao.tbk.sc.material.optional"
 	Constants.AlimamaTbkCouponGet = "taobao.tbk.coupon.get"
+	Constants.AlimamaTbkScOrderDetailsGet = "taobao.tbk.sc.order.details.get"
 }
