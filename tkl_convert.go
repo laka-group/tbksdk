@@ -170,7 +170,7 @@ func PrivilegeGet(session string, itemId int64, adzoneId string, siteId string) 
 	if err != nil {
 		return nil, err
 	}
-	//得到了返回,但不是item信息,尝试解析为ErrorResponse
+	// 得到了返回,但不是item信息,尝试解析为ErrorResponse
 	if respData.TbkPrivilegeGetResponse.Result.Data.ItemID == 0 {
 		errorResponse := ErrorResponse{}
 		_ = json.Unmarshal(*bodyByte, &errorResponse)
@@ -407,6 +407,16 @@ type PublisherOrderDto struct {
 	RelationId                         int64  `json:"relation_id"`
 }
 
+type TbkScActivityResponse struct {
+	TbkScActivitylinkToolgetResponse struct {
+		ResultMsg    string `json:"result_msg"`
+		Data         string `json:"data"`
+		ResultCode   int64  `json:"result_code"`
+		BizErrorDesc string `json:"biz_error_desc"`
+		BizErrorCode int64  `json:"biz_error_code"`
+	} `json:"tbk_sc_activitylink_toolget_response"`
+}
+
 /**
 淘宝客-服务商-所有订单查询
 https://open.taobao.com/api.htm?spm=a219a.7386653.0.0.2b43669aJY6jMz&source=search&docId=43755&docType=2
@@ -441,6 +451,67 @@ func TbkScOrderDetailsGet(startTime string, endTime string, session string, page
 		return nil, errors.New("data is empty")
 	}
 	return &respData.TbkScOrderDetailsGetResponse, nil
+}
+
+// 官方活动转链 https://open.taobao.com/api.htm?docId=41921&docType=2&source=search
+func TbkScActivityLinkToolGet(activityId int64, adzoneId, siteId, session string) (string, error) {
+	paramMap := map[string]string{
+		"adzone_id":          adzoneId,
+		"site_id":            siteId,
+		"promotion_scene_id": strconv.FormatInt(activityId, 10),
+		"platform":           "2",
+		"session":            session,
+	}
+	var bodyByte, err = apply(Constants.AlimamaTbkScActivityLinkToolGet, paramMap)
+	if err != nil {
+		return "", err
+	}
+	var respData = TbkScActivityResponse{}
+	err = json.Unmarshal(*bodyByte, &respData)
+	if err != nil {
+		return "", err
+	}
+	return respData.TbkScActivitylinkToolgetResponse.Data, nil
+}
+
+type TbkSpreadGetResponse struct {
+	TbkSpreadGetResponse struct {
+		Results struct {
+			TbkSpread []struct {
+				Content string `json:"content"`
+				ErrMsg  string `json:"err_msg"`
+			} `json:"tbk_spread"`
+		} `json:"results"`
+		TotalResults int    `json:"total_results"`
+		RequestID    string `json:"request_id"`
+	} `json:"tbk_spread_get_response"`
+}
+
+// 长链转短链 https://open.taobao.com/api.htm?spm=a219a.7386797.0.0.723f669aQgtoLl&source=search&docId=27832&docType=2
+func TbkSpreadGet(url, session string) (string, error) {
+	paramMap := map[string]string{
+		"app_key":     Constants.AlimamaKey,
+		"method":      Constants.AlimamaTbkSpreadGet,
+		"session":     session,
+		"format":      "json",
+		"v":           "2.0",
+		"sign_method": "md5",
+		"timestamp":   time.Now().Format("2006-01-02 15:04:05"),
+		"requests":    `[{"url":"` + url + `"}]`,
+	}
+	var bodyByte, err = apply(Constants.AlimamaTbkSpreadGet, paramMap)
+	if err != nil {
+		return "", err
+	}
+	var respData = TbkSpreadGetResponse{}
+	err = json.Unmarshal(*bodyByte, &respData)
+	if err != nil {
+		return "", err
+	}
+	if len(respData.TbkSpreadGetResponse.Results.TbkSpread) > 0 {
+		return respData.TbkSpreadGetResponse.Results.TbkSpread[0].Content, nil
+	}
+	return "", nil
 }
 
 func apply(api string, params map[string]string) (*[]byte, error) {
@@ -488,7 +559,7 @@ func createSign(paramMap map[string]string) string {
 	var paramKeySlice []string
 
 	for k, _ := range paramMap {
-		//&& k != "session"
+		// && k != "session"
 		if k != "" {
 			paramKeySlice = append(paramKeySlice, k)
 		}
