@@ -19,8 +19,8 @@ var Constants = constants{}
 
 func init() {
 	// alimama related
-	Constants.AlimamaKey = "27709680"
-	Constants.AlimamaSecret = "639563ff1c0f63837c1cb1a72134a86e"
+	Constants.AlimamaKey = ""
+	Constants.AlimamaSecret = ""
 	// api
 	Constants.AlimamaApiUrl = "http://gw.api.taobao.com/router/rest?"
 	Constants.AlimamaTpwdConvertUrl = "taobao.tbk.sc.tpwd.convert"
