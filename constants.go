@@ -1,25 +1,27 @@
 package tbksdk
 
 type constants struct {
-	AlimamaKey                  string
-	AlimamaSecret               string
-	AlimamaApiUrl               string
-	AlimamaTpwdConvertUrl       string
-	AlimamaItemInfoGetUrl       string
-	AlimamaPrivilegeGet         string
-	AlimamaTklCreate            string
-	AlimamaScMaterialOptional   string
-	AlimamaTbkCouponGet         string
-	AlimamaTbkScOrderDetailsGet string
+	AlimamaKey                      string
+	AlimamaSecret                   string
+	AlimamaApiUrl                   string
+	AlimamaTpwdConvertUrl           string
+	AlimamaItemInfoGetUrl           string
+	AlimamaPrivilegeGet             string
+	AlimamaTklCreate                string
+	AlimamaScMaterialOptional       string
+	AlimamaTbkCouponGet             string
+	AlimamaTbkScOrderDetailsGet     string
+	AlimamaTbkScActivityLinkToolGet string
+	AlimamaTbkSpreadGet             string
 }
 
 var Constants = constants{}
 
 func init() {
 	// alimama related
-	Constants.AlimamaKey = ""
-	Constants.AlimamaSecret = ""
-	//api
+	Constants.AlimamaKey = "27709680"
+	Constants.AlimamaSecret = "639563ff1c0f63837c1cb1a72134a86e"
+	// api
 	Constants.AlimamaApiUrl = "http://gw.api.taobao.com/router/rest?"
 	Constants.AlimamaTpwdConvertUrl = "taobao.tbk.sc.tpwd.convert"
 	Constants.AlimamaItemInfoGetUrl = "taobao.tbk.item.info.get"
@@ -28,4 +30,6 @@ func init() {
 	Constants.AlimamaScMaterialOptional = "taobao.tbk.sc.material.optional"
 	Constants.AlimamaTbkCouponGet = "taobao.tbk.coupon.get"
 	Constants.AlimamaTbkScOrderDetailsGet = "taobao.tbk.sc.order.details.get"
+	Constants.AlimamaTbkScActivityLinkToolGet = "taobao.tbk.sc.activitylink.toolget" // 官方活动转链
+	Constants.AlimamaTbkSpreadGet = "taobao.tbk.spread.get"                          // 官方活动长链转短链
 }
