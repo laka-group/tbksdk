@@ -421,7 +421,11 @@ type TbkScActivityResponse struct {
 淘宝客-服务商-所有订单查询
 https://open.taobao.com/api.htm?spm=a219a.7386653.0.0.2b43669aJY6jMz&source=search&docId=43755&docType=2
 */
-func TbkScOrderDetailsGet(startTime string, endTime string, session string, pageNo int64, pageSize int64, positionIndex string, queryType int64) (*TbkScOrderDetailsGetResponse, error) {
+func TbkScOrderDetailsGet(startTime string, endTime string, session string, pageNo int64, pageSize int64, positionIndex string, queryType, orderScene int64) (*TbkScOrderDetailsGetResponse, error) {
+	orderSceneStr := "1"
+	if orderScene != 0 {
+		orderSceneStr = strconv.FormatInt(orderScene, 10)
+	}
 	var paramsMap = map[string]string{
 		"start_time":     startTime,
 		"end_time":       endTime,
@@ -431,7 +435,7 @@ func TbkScOrderDetailsGet(startTime string, endTime string, session string, page
 		"position_index": positionIndex,
 		"query_type":     strconv.FormatInt(queryType, 10),
 		"jump_type":      "1",
-		"order_scene":    "1",
+		"order_scene":    orderSceneStr,
 	}
 	var bodyByte, err = apply(Constants.AlimamaTbkScOrderDetailsGet, paramsMap)
 	if err != nil {
